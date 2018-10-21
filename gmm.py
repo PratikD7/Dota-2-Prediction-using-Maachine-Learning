@@ -17,6 +17,8 @@ import km as kmeans_model
 from math import log
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.decomposition import PCA as sklearn_PCA
+
+
 # =============================================================================#
 def mstd(ds):
     mean = []
@@ -27,25 +29,28 @@ def mstd(ds):
         std_dev.append(statistics.stdev(col_values))
     return mean, std_dev
 
+
 # =============================================================================#
 # Z-normalize the dataset i.e value = (value - mean)/stdev
 def z_normalize(ds, mean, std_dev):
     for row in ds:
         for i in range(len(row)):
-            if row[i] != None:
+            if row[i] is not None:
                 row[i] = ((row[i]) - mean[i]) / std_dev[i]
-# =============================================================================#
 
+
+# =============================================================================#
 def norm_pdf_multivariate(x, mu, sigma):
     size = len(x)
     if size == len(mu) and (size, size) == sigma.shape:
         det = linalg.det(sigma)
         if det == 0:
-            return math.pow(10,-4)
+            return math.pow(10, -4)
             # return 0.0
             # raise NameError("The covariance matrix can't be singular")
         try:
-            norm_const = 1.0 / (math.pow((2 * math.pi), float(size) / 2) * math.pow(det, 1.0 / 2))
+            norm_const = 1.0 / (math.pow((2 * math.pi), float(size) / 2) *
+                                math.pow(det, 1.0 / 2))
         except:
             return math.pow(10, -4)
         try:
@@ -61,7 +66,8 @@ def norm_pdf_multivariate(x, mu, sigma):
 
 # =============================================================================#
 # Initialize the parameters theta
-def initialize_the_parameters(centroids, znk, mu_k, pi_k, copy_of_dataset, sigma_k):
+def initialize_the_parameters(centroids, znk, mu_k, pi_k, copy_of_dataset,
+                              sigma_k):
     sigk = []
 
     for row in centroids:
@@ -95,16 +101,10 @@ def e_step(col, row, pi_k, sigma_k, X, mu_k):
             # Calculate num
             num = pi_k[k] * norm_pdf_multivariate(X[n], mu_k[k], sigma_k[k])
 
-
-            if den==0.0:
-                znk[n][k] = math.pow(10,-4)
+            if den == 0.0:
+                znk[n][k] = math.pow(10, -4)
             else:
-                znk[n][k] == num/den
-            # if num==0.0:
-            #     # znk[n][k] = math.pow(10.0, -4)  # Correction
-            # if den == 0.0:
-            #     # znk[n][k] = math.pow(10.0, -4)  # Correction
-
+                znk[n][k] == num / den
     return znk
 
 
@@ -178,7 +178,8 @@ def calculate_convergence_value(mu_k, prev_mu_k):
 
 
 # =============================================================================#
-def GMM_algoithm(max_iterations, dataset, flag, tolerance, znk, pi_k, sigma_k, mu_k, prev_mu_k, prev_sigma_k):
+def GMM_algoithm(max_iterations, dataset, flag, tolerance, znk, pi_k, sigma_k,
+                 mu_k, prev_mu_k, prev_sigma_k):
     for i in range(max_iterations):
         print(i)
         # E-STEP
@@ -215,7 +216,8 @@ def calculate_SSE(znk, mu_k, X):
         for row in znk:
             if row[i] == row.index(max(row)):
                 temp.append(X[idx])
-                sum_squared_error += abs(numpy.linalg.norm(mu_k[outer_idx] - X[idx])) ** 2
+                sum_squared_error += abs(
+                    numpy.linalg.norm(mu_k[outer_idx] - X[idx])) ** 2
 
             idx += 1
         SSE.append(sum_squared_error)
@@ -252,18 +254,22 @@ def main():
             pi_k = []
             sigma_k = []
             # Initialize the parameters theta
-            SSE, znk, centroids = kmeans_model.k_means_algorithm(copy_of_dataset, k, max_iterations)
-            pi_k, sigma_k, mu_k = initialize_the_parameters(centroids, znk, mu_k, pi_k, copy_of_dataset, sigma_k)
+            SSE, znk, centroids = kmeans_model.k_means_algorithm(
+                copy_of_dataset, k, max_iterations)
+            pi_k, sigma_k, mu_k = initialize_the_parameters(centroids, znk,
+                                                            mu_k, pi_k,
+                                                            copy_of_dataset,
+                                                            sigma_k)
             prev_mu_k = mu_k
             prev_sigma_k = sigma_k
             try:
-                mu_k, sigma_k, pi_k = GMM_algoithm(max_iterations, copy_of_dataset, flag, tolerance, znk, pi_k, sigma_k, mu_k, prev_mu_k, prev_sigma_k)
+                mu_k, sigma_k, pi_k = GMM_algoithm(max_iterations,
+                                                   copy_of_dataset, flag,
+                                                   tolerance, znk, pi_k,
+                                                   sigma_k, mu_k, prev_mu_k,
+                                                   prev_sigma_k)
                 SSE = calculate_SSE(znk, mu_k, copy_of_dataset)
                 sum_sq_err.append(SSE)
-                # print("SSE for k= ", end='')
-                # print(k, end='')
-                # print(' is ', end='')
-                # print(sum(SSE))
 
                 true_labels = []
                 pred_labels = []
@@ -273,18 +279,9 @@ def main():
                 znk = znk.tolist()
                 for row in znk:
                     pred_labels.append(row.index(max(row)))
-                # nmi_score.append(normalized_mutual_info_score(true_labels, pred_labels))
-                # print("K= ", end='')
-                # print(k, end='')
-                # print(" NMI score = ", normalized_mutual_info_score(true_labels, pred_labels))
                 print(accuracy_score(true_labels, pred_labels))
             except TypeError:
                 SSE = calculate_SSE(znk, mu_k, copy_of_dataset)
-                # sum_sq_err.append(SSE)
-                # print("SSE for k= ", end='')
-                # print(k, end='')
-                # print(' is ', end='')
-                # print(sum(SSE))
 
                 true_labels = []
                 pred_labels = []
@@ -294,17 +291,8 @@ def main():
                 znk = znk.tolist()
                 for row in znk:
                     pred_labels.append(row.index(max(row)))
-                # nmi_score.append(normalized_mutual_info_score(true_labels, pred_labels))
-                # print("K= ", end='')
-                # print(k, end='')
-                # print(" NMI score = ", normalized_mutual_info_score(true_labels, pred_labels))
                 print(accuracy_score(true_labels, pred_labels))
         pass
-        # plt.plot(K, sum_sq_err)
-        # plt.title("GMM-SSE against K: Vowels Dataset")
-        # plt.xlabel("K")
-        # plt.ylabel("SSE")
-        # plt.show()
 
 
 # =============================================================================#

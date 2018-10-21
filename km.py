@@ -50,7 +50,9 @@ def calculate_centroids(k, znk, data, cen):
         for row in znk:
             if row[i] == 1.0:
                 temp.append(data[idx])
-                sum_of_squared_errors += abs(numpy.linalg.norm(cen[outer_idx] - data[idx])) ** 2
+                sum_of_squared_errors += abs(numpy.linalg.norm(cen[outer_idx]
+                                                               - data[
+                                                                   idx])) ** 2
             idx += 1
         temp = numpy.array(temp)
         centroids.append(temp.mean(axis=0))
@@ -93,13 +95,8 @@ def k_means_algorithm(dataset, k, max_iterations):
 
 
 # =============================================================================#
-# def calculate_NMI():
-
-
-# =============================================================================#
 # MAIN FUNCTION
 def main():
-    # dataset_list = ['dermatologyData.csv', 'ecoliData.csv', 'glassData.csv', 'soybeanData.csv', 'vowelsData.csv', 'yeastData.csv']
     dataset_list = ['sample_features.csv']
     true_labels = []
     nmi_score = []
@@ -112,8 +109,6 @@ def main():
 
         copy_of_dataset = copy.deepcopy(dataset)
         copy_of_dataset = numpy.array(copy_of_dataset)
-
-        # copy_of_dataset = numpy.delete(copy_of_dataset,0,1)
 
         K = numpy.array([2])
         for k in K:
@@ -131,11 +126,14 @@ def main():
             for row in znk:
                 pred_labels.append(row.index(max(row)))
 
-            nmi_score.append(normalized_mutual_info_score(true_labels, pred_labels))
+            nmi_score.append(normalized_mutual_info_score(true_labels,
+                                                          pred_labels))
             print("K=", end='')
             print(k, end='')
-            print(" NMI score = ", normalized_mutual_info_score(true_labels, pred_labels))
-            print("Testing accuracy= ",accuracy_score(true_labels, pred_labels))
+            print(" NMI score = ", normalized_mutual_info_score(true_labels,
+                                                                pred_labels))
+            print("Testing accuracy= ",
+                  accuracy_score(true_labels, pred_labels))
             # calculate_NMI()
         print("-" * 50)
         # plt.plot(K, sum_sq_error)
